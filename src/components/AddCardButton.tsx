@@ -1,13 +1,14 @@
-import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
+import { Button } from "./ui/button"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "./ui/dialog"
+import { CardForm } from "./CardForm"
 import { useState } from "react"
-import { AddCardForm } from "@/components/AddCardForm"
 
 export function AddCardButton() {
   const [open, setOpen] = useState(false)
@@ -19,7 +20,7 @@ export function AddCardButton() {
           variant="outline"
           className="h-40 border-dashed flex flex-col gap-2 hover:border-solid"
         >
-          <span className="text-2xl">+</span>
+          <Plus className="text-2xl" />
           <span>Add a card</span>
         </Button>
       </DialogTrigger>
@@ -27,7 +28,7 @@ export function AddCardButton() {
         <DialogHeader>
           <DialogTitle>Add New Card</DialogTitle>
         </DialogHeader>
-        <AddCardForm onSuccess={() => setOpen(false)} />
+        <CardForm onDone={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
   )

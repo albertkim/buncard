@@ -27,6 +27,14 @@ export function CardProvider({ children }: { children: ReactNode }) {
   }, [cards])
 
   const addCard = (card: Omit<Card, "id" | "createdAt" | "updatedAt">) => {
+    // Check if card with same barcode already exists
+    const isDuplicate = cards.some(
+      (existingCard) => existingCard.barcode === card.barcode
+    )
+    if (isDuplicate) {
+      return // Don't add duplicate cards
+    }
+
     const newCard: Card = {
       ...card,
       id: crypto.randomUUID(),

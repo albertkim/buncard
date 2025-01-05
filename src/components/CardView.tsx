@@ -1,37 +1,38 @@
-import { Button } from "@/components/ui/button"
-import { Card } from "@/types/card"
-import { useCardContext } from "@/context/CardContext"
+import { Card as CardType } from "@/types/card"
+import { Button } from "./ui/button"
+import Barcode from "react-barcode"
 
 interface CardViewProps {
-  card: Card
+  card: CardType
   onEdit: () => void
+  onDelete: () => void
+  deleteConfirm: boolean
 }
 
-export function CardView({ card, onEdit }: CardViewProps) {
-  const { deleteCard } = useCardContext()
-
-  const handleDelete = () => {
-    if (confirm("Are you sure you want to delete this card?")) {
-      deleteCard(card.id)
-    }
-  }
-
+export function CardView({
+  card,
+  onEdit,
+  onDelete,
+  deleteConfirm,
+}: CardViewProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <h2 className="text-2xl font-bold">{card.name}</h2>
-        {/* TODO: Add barcode display component */}
-        <div className="h-32 bg-gray-100 rounded flex items-center justify-center">
-          {card.barcode}
+        <div className="h-32 mt-2 rounded flex items-center justify-center">
+          <Barcode value={card.barcode} />
         </div>
       </div>
 
       <div className="flex gap-2">
-        <Button onClick={onEdit} variant="outline" className="flex-1">
+        <Button onClick={onEdit} variant="outline">
           Edit
         </Button>
-        <Button onClick={handleDelete} variant="destructive" className="flex-1">
-          Delete
+        <Button
+          onClick={onDelete}
+          variant={deleteConfirm ? "destructive" : "outline"}
+        >
+          {deleteConfirm ? "Are you sure?" : "Delete"}
         </Button>
       </div>
     </div>
