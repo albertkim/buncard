@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useCards } from "@/hooks/useCards"
+import { useCardContext } from "@/context/CardContext"
 import { useState } from "react"
 
 const CARD_COLORS = [
@@ -21,7 +21,7 @@ interface AddCardFormProps {
 }
 
 export function AddCardForm({ onSuccess }: AddCardFormProps) {
-  const { addCard } = useCards()
+  const { addCard } = useCardContext()
   const [name, setName] = useState("")
   const [barcode, setBarcode] = useState("")
   const [selectedColor, setSelectedColor] = useState(CARD_COLORS[0])

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/types/card"
-import { useCards } from "@/hooks/useCards"
+import { useCardContext } from "@/context/CardContext"
 
 interface CardViewProps {
   card: Card
@@ -8,7 +8,7 @@ interface CardViewProps {
 }
 
 export function CardView({ card, onEdit }: CardViewProps) {
-  const { deleteCard } = useCards()
+  const { deleteCard } = useCardContext()
 
   const handleDelete = () => {
     if (confirm("Are you sure you want to delete this card?")) {

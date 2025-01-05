@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/types/card"
-import { useCards } from "@/hooks/useCards"
+import { useCardContext } from "@/context/CardContext"
 import { useState } from "react"
 
 interface CardEditProps {
@@ -10,7 +10,7 @@ interface CardEditProps {
 }
 
 export function CardEdit({ card, onDone }: CardEditProps) {
-  const { updateCard } = useCards()
+  const { updateCard } = useCardContext()
   const [name, setName] = useState(card.name)
   const [barcode, setBarcode] = useState(card.barcode)
 

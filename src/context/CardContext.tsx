@@ -1,7 +1,22 @@
-import { useState, useEffect } from "react"
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react"
 import { Card } from "@/types/card"
 
-export function useCards() {
+interface CardContextType {
+  cards: Card[]
+  addCard: (card: Omit<Card, "id" | "createdAt" | "updatedAt">) => void
+  updateCard: (id: string, updates: Partial<Card>) => void
+  deleteCard: (id: string) => void
+}
+
+const CardContext = createContext<CardContextType | undefined>(undefined)
+
+export function CardProvider({ children }: { children: ReactNode }) {
   const [cards, setCards] = useState<Card[]>(() => {
     const saved = localStorage.getItem("buncard-cards")
     return saved ? JSON.parse(saved) : []
@@ -33,5 +48,17 @@ export function useCards() {
     setCards((prev) => prev.filter((card) => card.id !== id))
   }
 
-  return { cards, addCard, updateCard, deleteCard }
+  return (
+    <CardContext.Provider value={{ cards, addCard, updateCard, deleteCard }}>
+      {children}
+    </CardContext.Provider>
+  )
+}
+
+export function useCardContext() {
+  const context = useContext(CardContext)
+  if (context === undefined) {
+    throw new Error("useCardContext must be used within a CardProvider")
+  }
+  return context
 }
