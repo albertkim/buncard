@@ -50,11 +50,17 @@ export function Export({ cards }: ExportProps) {
         <div className="mt-4">
           <div className="rounded-md bg-muted p-4">
             <pre className="text-sm overflow-auto max-h-[400px]">
-              {JSON.stringify(exportData, null, 2)}
+              {cards.length === 0
+                ? "Nothing to export"
+                : JSON.stringify(exportData, null, 2)}
             </pre>
           </div>
 
-          <Button onClick={handleDownload} className="mt-4">
+          <Button
+            onClick={handleDownload}
+            className="mt-4"
+            disabled={cards.length === 0}
+          >
             <Download className="mr-2 h-4 w-4" />
             Download
           </Button>

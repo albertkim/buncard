@@ -65,11 +65,13 @@ export function CardForm({ card, onDone }: CardFormProps) {
     return (
       <div className="space-y-4">
         <div className="relative">
-          <BarcodeScannerComponent
-            width="100%"
-            height={400}
-            onUpdate={(_error, result) => handleScan(result?.toString())}
-          />
+          <div className="h-[400px]">
+            <BarcodeScannerComponent
+              width="100%"
+              height={400}
+              onUpdate={(_error, result) => handleScan(result?.toString())}
+            />
+          </div>
           <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-4">
             <Button
               type="button"
