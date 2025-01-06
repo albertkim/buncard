@@ -12,6 +12,22 @@ import { useState } from "react"
 
 export function AddCardButton() {
   const [open, setOpen] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const handleMouseDown = () => {
+    setIsDragging(false)
+  }
+
+  const handleMouseMove = () => {
+    setIsDragging(true)
+  }
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (isDragging) {
+      e.preventDefault()
+      setIsDragging(false)
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -19,6 +35,9 @@ export function AddCardButton() {
         <Button
           variant="outline"
           className="h-40 border-dashed flex flex-col gap-2 hover:border-solid"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onClick={handleClick}
         >
           <Plus className="text-2xl" />
           <span>Add a card</span>

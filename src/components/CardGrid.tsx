@@ -8,24 +8,32 @@ export function CardGrid() {
   const ITEMS_PER_PAGE = 6
 
   const getPages = () => {
-    // Always have minimum 2 pages, and add extra page if last page is full
-    const pagesNeeded = Math.ceil(cards.length / ITEMS_PER_PAGE)
-    const totalPages = Math.max(
-      2,
-      cards.length % ITEMS_PER_PAGE === 0 ? pagesNeeded + 1 : pagesNeeded
-    )
+    type GridItem = { type: "card"; card: (typeof cards)[0] } | { type: "add" }
+
+    const itemsToRender: GridItem[] = [
+      ...cards.map((card) => ({ type: "card" as const, card })),
+      { type: "add" as const },
+    ]
+
+    const pagesNeeded = Math.ceil(itemsToRender.length / ITEMS_PER_PAGE)
+    const totalPages = Math.max(2, pagesNeeded)
 
     return Array.from({ length: totalPages }, (_, pageIndex) => {
       const startIndex = pageIndex * ITEMS_PER_PAGE
-      const pageCards = cards.slice(startIndex, startIndex + ITEMS_PER_PAGE)
-      const hasSpace = pageCards.length < ITEMS_PER_PAGE
+      const pageItems = itemsToRender.slice(
+        startIndex,
+        startIndex + ITEMS_PER_PAGE
+      )
 
       return (
         <div key={`page-${pageIndex}`} className="grid grid-cols-2 gap-4">
-          {pageCards.map((card) => (
-            <Card key={card.id} card={card} />
-          ))}
-          {hasSpace && <AddCardButton key="add-button" />}
+          {pageItems.map((item) =>
+            item.type === "card" ? (
+              <Card key={item.card.id} card={item.card} />
+            ) : (
+              <AddCardButton key="add-button" />
+            )
+          )}
         </div>
       )
     })
