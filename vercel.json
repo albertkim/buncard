@@ -1,14 +1,8 @@
 {
-  "rewrites": [
-    {
-      "source": "/(.+\\.(ico|png|jpg|jpeg|svg|json|txt|css|js|webp))",
-      "destination": "/$1"
-    },
-    { "source": "/(.*)", "destination": "/" }
-  ],
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
     {
-      "source": "/(.+\\.json)",
+      "source": "/manifest.json",
       "headers": [
         {
           "key": "Cache-Control",
