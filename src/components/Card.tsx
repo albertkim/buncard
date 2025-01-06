@@ -13,8 +13,8 @@ function getContrastColor(backgroundColor: string) {
   // Convert hex to RGB
   const hex = backgroundColor.replace("#", "")
   const r = parseInt(hex.substring(0, 2), 16)
-  const g = parseInt(hex.substring(2, 2), 16)
-  const b = parseInt(hex.substring(4, 2), 16)
+  const g = parseInt(hex.substring(2, 4), 16) // Fixed: was (2, 2)
+  const b = parseInt(hex.substring(4, 6), 16) // Fixed: was (4, 2)
 
   // Calculate relative luminance using the formula from WCAG 2.0
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
@@ -28,6 +28,22 @@ export function Card({ card }: CardProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const { deleteCard } = useCardContext()
+  const [isDragging, setIsDragging] = useState(false)
+
+  const handleMouseDown = () => {
+    setIsDragging(false)
+  }
+
+  const handleMouseMove = () => {
+    setIsDragging(true)
+  }
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (isDragging) {
+      e.preventDefault()
+      setIsDragging(false)
+    }
+  }
 
   useEffect(() => {
     let timer: NodeJS.Timeout
@@ -59,6 +75,9 @@ export function Card({ card }: CardProps) {
             backgroundColor: card.backgroundColor,
             color: getContrastColor(card.backgroundColor),
           }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onClick={handleClick}
         >
           <span className="text-lg font-medium">{card.name}</span>
         </button>

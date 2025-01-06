@@ -7,6 +7,7 @@ import BarcodeScannerComponent from "react-qr-barcode-scanner"
 import { QrCode } from "lucide-react"
 
 const CARD_COLORS = [
+  "#fafafa", // very light gray
   "#ef4444", // red
   "#f97316", // orange
   "#f59e0b", // amber
@@ -28,8 +29,8 @@ export function CardForm({ card, onDone }: CardFormProps) {
   const { addCard, updateCard } = useCardContext()
   const [name, setName] = useState(card?.name ?? "")
   const [barcode, setBarcode] = useState(card?.barcode ?? "")
-  const [selectedColor, setSelectedColor] = useState(
-    card?.backgroundColor ?? CARD_COLORS[0]
+  const [selectedColor, setSelectedColor] = useState<string>(
+    card?.backgroundColor ?? "#fafafa"
   )
   const [showScanner, setShowScanner] = useState(false)
 
@@ -41,7 +42,9 @@ export function CardForm({ card, onDone }: CardFormProps) {
     const cardData = {
       name,
       barcode,
-      backgroundColor: selectedColor,
+      backgroundColor:
+        selectedColor ??
+        CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)],
       barcodeType: "code128" as const,
     }
 

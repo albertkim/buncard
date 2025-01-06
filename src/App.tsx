@@ -5,9 +5,9 @@ import { CardProvider } from "@/context/CardContext"
 export function App() {
   return (
     <CardProvider>
-      <div className="flex h-[100dvh] flex-col overflow-hidden">
+      <div className="h-[100dvh] flex flex-col">
         <Navbar />
-        <main className="flex-1 container mx-auto p-4 overflow-y-auto">
+        <main className="flex-1 container mx-auto p-4 overflow-y-auto overscroll-contain">
           <CardGrid />
         </main>
       </div>

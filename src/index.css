@@ -7,3 +7,17 @@
     --radius: 0.5rem;
   }
 }
+
+/* Prevent bounce scroll */
+html,
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+  overflow: hidden;
+}
