@@ -48,6 +48,8 @@ export default function App() {
           onOpen={(id) => setView({ type: "card", id })}
           onSettings={() => setView({ type: "settings" })}
           onExport={wallet.exportCards}
+          showInstall={!install.isInstalled}
+          onInstall={() => setView({ type: "install" })}
         />
         <AnimatePresence mode="wait">
           {(view.type === "add" || (view.type === "edit" && activeCard)) && (

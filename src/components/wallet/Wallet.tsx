@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-import { ChevronRight, Plus, ScanLine, Search, Sparkles, X } from "lucide-react"
+import { ChevronRight, Plus, ScanLine, Search, Smartphone, Sparkles, X } from "lucide-react"
 import type { Card } from "../../domain/cards"
 
 interface WalletProps {
@@ -11,9 +11,21 @@ interface WalletProps {
   onOpen: (id: string) => void
   onSettings: () => void
   onExport: () => void
+  showInstall: boolean
+  onInstall: () => void
 }
 
-export function Wallet({ cards, storageError, celebrating, onAdd, onOpen, onSettings, onExport }: WalletProps) {
+export function Wallet({
+  cards,
+  storageError,
+  celebrating,
+  onAdd,
+  onOpen,
+  onSettings,
+  onExport,
+  showInstall,
+  onInstall,
+}: WalletProps) {
   const [query, setQuery] = useState("")
   const reduced = useReducedMotion()
   const visible = cards
@@ -39,6 +51,13 @@ export function Wallet({ cards, storageError, celebrating, onAdd, onOpen, onSett
         )}
       </div>
       <h1 className="sr-only">Your wallet</h1>
+      {showInstall && (
+        <button className="home-screen-button" onClick={onInstall}>
+          <Smartphone size={20} aria-hidden="true" />
+          <span>Add to home screen</span>
+          <ChevronRight size={18} aria-hidden="true" />
+        </button>
+      )}
       {storageError && (
         <div className="error storage-error" role="alert">
           {storageError}

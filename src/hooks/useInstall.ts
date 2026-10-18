@@ -8,13 +8,31 @@ interface InstallEvent extends Event {
 
 export function useInstall() {
   const [install, setInstall] = useState<InstallEvent | null>(null)
+  const [isInstalled, setIsInstalled] = useState(
+    () =>
+      window.matchMedia("(display-mode: standalone)").matches ||
+      !!(navigator as Navigator & { standalone?: boolean }).standalone
+  )
   useEffect(() => {
     const capture = (event: Event) => {
       event.preventDefault()
       setInstall(event as InstallEvent)
     }
+    const displayMode = window.matchMedia("(display-mode: standalone)")
+    const installed = () => {
+      setIsInstalled(true)
+      setInstall(null)
+    }
+    const changed = () =>
+      setIsInstalled(displayMode.matches || !!(navigator as Navigator & { standalone?: boolean }).standalone)
     window.addEventListener("beforeinstallprompt", capture)
-    return () => window.removeEventListener("beforeinstallprompt", capture)
+    window.addEventListener("appinstalled", installed)
+    displayMode.addEventListener("change", changed)
+    return () => {
+      window.removeEventListener("beforeinstallprompt", capture)
+      window.removeEventListener("appinstalled", installed)
+      displayMode.removeEventListener("change", changed)
+    }
   }, [])
 
   async function promptInstall() {
@@ -27,5 +45,5 @@ export function useInstall() {
     return true
   }
 
-  return { canPrompt: !!install, promptInstall }
+  return { canPrompt: !!install, isInstalled, promptInstall }
 }
