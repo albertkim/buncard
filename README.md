@@ -28,7 +28,7 @@ npm run format:check
 - `src/lib/` handles storage, backups, and service-worker registration.
 - `src/styles/` groups shared styles and component styles behind a single CSS entry point.
 
-Camera scanning and barcode rendering load on demand. Animations respect reduced-motion preferences. Sheet dragging updates a transform without React renders per frame, while preserving native scrolling, text editing, keyboard dismissal, and focus restoration.
+Camera scanning loads on demand. Barcode rendering loads with the wallet so opening a card never waits on a second download. Each code has a reserved display area to prevent layout shifts. Animations respect reduced-motion preferences. Sheet dragging updates a transform without React renders per frame, while preserving native scrolling, text editing, keyboard dismissal, and focus restoration.
 
 ## Data and installation
 

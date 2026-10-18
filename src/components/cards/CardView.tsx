@@ -1,11 +1,10 @@
-import { lazy, Suspense, useState } from "react"
-import { motion } from "motion/react"
+import { useState } from "react"
 import { ChevronRight, Copy, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import type { Card } from "../../domain/cards"
 import { Sheet } from "../ui/Sheet"
 
-const CardCode = lazy(() => import("./CardCode"))
+import CardCode from "./CardCode"
 
 export function CardView({
   card,
@@ -21,20 +20,14 @@ export function CardView({
   const [confirmDelete, setConfirmDelete] = useState(false)
   return (
     <Sheet title={card.name} onClose={onClose} wide>
-      <motion.div
-        className="scan-card"
-        style={{ background: card.backgroundColor }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1, duration: 0.2 }}
-      >
+      <div className="scan-card" style={{ background: card.backgroundColor }}>
         <div className="barcode-paper">
-          <Suspense fallback={<p>Getting your card ready…</p>}>
+          <div className="barcode-graphic" data-format={card.barcodeType}>
             <CardCode card={card} />
-          </Suspense>
+          </div>
           <p className="card-number">{card.barcode}</p>
         </div>
-      </motion.div>
+      </div>
       <div className="scan-actions">
         <button
           onClick={async () => {

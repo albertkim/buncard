@@ -458,3 +458,18 @@
     transform: none;
   }
 }
+
+/* Reserve the final SVG area before the sheet's first paint. */
+.barcode-graphic {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 132px;
+  min-width: 0;
+}
+.barcode-graphic[data-format="qr"] {
+  height: 200px;
+}
+.barcode-graphic svg {
+  max-height: 100%;
+}
