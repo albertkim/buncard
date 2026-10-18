@@ -2688,3 +2688,22 @@ legend {
     inset: auto;
   }
 }
+.sheet {
+  overscroll-behavior-y: contain;
+  touch-action: pan-y pinch-zoom;
+  will-change: transform, opacity;
+}
+.sheet[data-dragging="true"] {
+  user-select: none;
+  cursor: grabbing;
+}
+.sheet[data-dragging="true"] * {
+  user-select: none;
+}
+.sheet-handle {
+  cursor: grab;
+}
+.scrim {
+  backdrop-filter: none;
+  background: #23252899;
+}

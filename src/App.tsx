@@ -19,6 +19,7 @@ import {
 } from "lucide-react"
 import { Toaster, toast } from "sonner"
 import type { Card } from "./types/card"
+import { useSheetDrag } from "./useSheetDrag"
 import { downloadBackup, loadCards, normalizeCard, STORAGE_KEY, validCard } from "./storage"
 const Code = lazy(() => import("./Code"))
 const Scanner = lazy(() => import("react-qr-barcode-scanner"))
@@ -41,6 +42,7 @@ function Sheet({
   const [returnFocus] = useState(() => (document.activeElement instanceof HTMLElement ? document.activeElement : null))
   const present = useIsPresent()
   const reduced = useReducedMotion()
+  const { ref: sheetRef, y: sheetY } = useSheetDrag(present, reduced, onClose)
   return (
     <Dialog.Root
       open={present}
@@ -70,11 +72,12 @@ function Sheet({
           >
             <motion.div
               className={`sheet ${wide ? "scan-sheet" : ""}`}
-              initial={{ opacity: 0, y: reduced ? 0 : 56, scale: reduced ? 1 : 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: reduced ? 0 : 28, scale: reduced ? 1 : 0.98 }}
+              ref={sheetRef}
+              initial={{ opacity: 0, scale: reduced ? 1 : 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: reduced ? 1 : 0.98 }}
               transition={{ type: "spring", stiffness: 420, damping: 34, opacity: { duration: 0.16 } }}
-              style={{ pointerEvents: present ? "auto" : "none" }}
+              style={{ y: sheetY, pointerEvents: present ? "auto" : "none" }}
             >
               <div className="sheet-handle" />
               <div className="sheet-heading">

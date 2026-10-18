@@ -120,3 +120,92 @@ test("animated dialogs restore focus and remain usable with reduced motion", asy
   await page.getByRole("button", { name: "Close", exact: true }).click()
   await expect(page.getByRole("dialog")).toHaveCount(0)
 })
+
+async function pullSheet(
+  page: import("@playwright/test").Page,
+  mobile: boolean,
+  x: number,
+  y: number,
+  distance: number,
+  steps = 12
+) {
+  const touch = mobile ? await page.context().newCDPSession(page) : null
+  if (touch) await touch.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] })
+  else {
+    await page.mouse.move(x, y)
+    await page.mouse.down()
+  }
+  for (let i = 1; i <= steps; i++) {
+    const nextY = y + (distance * i) / steps
+    if (touch) await touch.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: nextY }] })
+    else await page.mouse.move(x, nextY)
+    await page.evaluate(() => new Promise(requestAnimationFrame))
+  }
+  return async () => {
+    if (touch) {
+      await touch.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] })
+      await touch.detach()
+    } else await page.mouse.up()
+  }
+}
+
+test("pulling the sheet content follows the finger, springs back, and dismisses without deleting cards", async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto("/")
+  await page.evaluate((card) => localStorage.setItem("buncard-cards", JSON.stringify([card])), legacy)
+  await page.reload()
+  await page.getByRole("button", { name: "Open Grocery club" }).click()
+  await expect(page.locator(".barcode-paper svg")).toBeVisible()
+  const sheet = page.getByRole("dialog")
+  await expect(sheet).toHaveCSS("transform", "none")
+  const surface = await page.locator(".barcode-paper").boundingBox()
+  const baseline = (await sheet.boundingBox())!.y
+  const releaseShort = await pullSheet(
+    page,
+    isMobile,
+    surface!.x + surface!.width / 2,
+    surface!.y + surface!.height / 2,
+    45,
+    18
+  )
+  expect((await sheet.boundingBox())!.y - baseline).toBeGreaterThan(25)
+  await releaseShort()
+  await expect(sheet).toHaveCSS("transform", "none")
+  await expect(sheet).toBeVisible()
+  const releaseLong = await pullSheet(page, isMobile, surface!.x + 30, surface!.y + 20, 180)
+  await releaseLong()
+  await expect(sheet).toHaveCount(0)
+  await expect(page.getByRole("button", { name: "Open Grocery club" })).toBeVisible()
+  let filePickers = 0
+  page.on("filechooser", () => filePickers++)
+  await page.getByRole("button", { name: "Wallet settings" }).click()
+  await expect(sheet).toHaveCSS("transform", "none")
+  const importButton = await page.getByRole("button", { name: "Import cards" }).boundingBox()
+  const releaseButton = await pullSheet(page, isMobile, importButton!.x + 30, importButton!.y + 15, 180)
+  await releaseButton()
+  await expect(sheet).toHaveCount(0)
+  expect(filePickers).toBe(0)
+})
+
+test("scrolling a long sheet preserves the form and does not dismiss it", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "Native touch scrolling is tested on the mobile viewport")
+  await page.setViewportSize({ width: 390, height: 520 })
+  await page.goto("/")
+  await page.getByRole("button", { name: "Add your first card" }).click()
+  const sheet = page.getByRole("dialog")
+  await expect(sheet).toHaveCSS("transform", "none")
+  const bounds = await page.locator(".mini-preview").boundingBox()
+  const release = await pullSheet(page, true, bounds!.x + 30, bounds!.y + 50, -130)
+  await release()
+  await expect.poll(() => sheet.evaluate((e) => e.scrollTop)).toBeGreaterThan(30)
+  const before = await sheet.evaluate((e) => e.scrollTop)
+  const area = await sheet.boundingBox()
+  const releaseDown = await pullSheet(page, true, area!.x + 8, area!.y + 80, 25, 10)
+  await releaseDown()
+  await expect(sheet).toBeVisible()
+  expect(await sheet.evaluate((e) => e.scrollTop)).toBeLessThan(before)
+  await page.getByLabel("Card name", { exact: true }).fill("Still editable")
+  await expect(page.getByLabel("Card name", { exact: true })).toHaveValue("Still editable")
+})
