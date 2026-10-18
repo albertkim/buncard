@@ -1,0 +1,45 @@
+/* Motion */
+
+@keyframes bun-hop {
+  0%,
+  to {
+    transform: rotate(-7deg) translateY(0);
+  }
+  40% {
+    transform: rotate(8deg) translateY(-6px);
+  }
+  70% {
+    transform: rotate(-12deg) translateY(-2px);
+  }
+}
+@keyframes scan-sweep {
+  0%,
+  to {
+    opacity: 0.3;
+    top: 10%;
+  }
+  50% {
+    opacity: 1;
+    top: 88%;
+  }
+}
+@keyframes card-settle {
+  0% {
+    opacity: 0;
+    transform: rotate(-5deg) translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(10deg) translateY(0);
+  }
+}
+@keyframes back-settle {
+  0% {
+    opacity: 0;
+    transform: rotate(5deg) translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-15deg) translateY(0);
+  }
+}

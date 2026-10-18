@@ -1,10 +1,10 @@
 # Buncard
 
-A small, private home for your loyalty cards. No accounts, ads, or tracking. Cards live in your browser, with JSON backups to move them between devices.
+A private, offline-capable loyalty card wallet. No accounts, ads, or tracking.
 
-## Run locally
+## Development
 
-Use Node 22.12+ (Node 24 LTS recommended).
+Requires Node 22.12 or newer. npm is the only package manager.
 
 ```sh
 npm ci
@@ -14,36 +14,30 @@ npm run dev
 ```sh
 npm run build
 npm run lint
-npm test
+npm run format:check
 ```
 
-For browser tests, install Chromium once with `npx playwright install chromium`. Tests run against the production build, so build first. `npm run preview -- --host 0.0.0.0` serves the built app on port 4173.
+`npm run preview -- --host 0.0.0.0` serves the production build on port 4173. The repository contains no test files or test framework dependencies.
 
-## The wallet experience
+## Source layout
 
-- One wallet page with search, a single add action, and a quiet backup/settings utility.
-- Ticket-shaped cards with graphic patterns, a custom rabbit identity, and spring-based press and layout feedback. Reduced-motion preferences are respected.
-- Pull down from sheet content to dismiss; short pulls spring back. Native scrolling and text editing remain available. Dragging updates a transform without React renders per frame.
-- Mobile bottom sheets, keyboard focus management, and large touch targets.
-- Scan a card with your camera or enter its number. Code 128, EAN-13, and QR display retain their saved format.
-- A clear checkout view requests a screen wake lock when supported. Brightness stays under the device's control.
-- Duplicate-safe imports, export backups, deletion with undo, and protection against overwriting unreadable saved data.
-- Installable PWA, a single generated manifest, offline app-shell caching, and locally bundled fonts.
+- `src/App.tsx` coordinates the wallet and the currently open sheet.
+- `src/components/` contains the wallet, card form and scanner, barcode view, installation instructions, settings, and shared sheet.
+- `src/hooks/` owns local card state, PWA installation, screen wake locks, and pull-to-dismiss gestures.
+- `src/domain/cards.ts` defines card types, colors, normalization, and barcode validation.
+- `src/lib/` handles storage, backups, and service-worker registration.
+- `src/styles/` groups shared styles and component styles behind a single CSS entry point.
 
-Existing `buncard-cards` local storage and original JSON exports are compatible. Import rejects invalid files before making changes. Cards are stored on this device and browser, not synced. Export before changing devices or clearing browser data. Installed apps can have separate storage on some platforms.
+Camera scanning and barcode rendering load on demand. Animations respect reduced-motion preferences. Sheet dragging updates a transform without React renders per frame, while preserving native scrolling, text editing, keyboard dismissal, and focus restoration.
 
-## Interaction research
+## Data and installation
 
-[Motion's React gestures](https://motion.dev/docs/react-gestures) and layout transitions suit tactile cards and collection changes without a bespoke gesture engine. [MotionConfig](https://motion.dev/docs/react-motion-config) applies the user's reduced-motion preference globally. Animation is feedback, never a prerequisite for using a card.
+Cards stay in this browser on this device under the original `buncard-cards` storage key. Original JSON backups remain compatible. Imports validate the complete file before saving and skip duplicate card numbers. Unreadable saved data is preserved for export.
 
-[Radix Dialog](https://www.radix-ui.com/primitives/docs/components/dialog) provides keyboard navigation, focus trapping, screen-reader announcements, and Escape dismissal. The same dialog becomes a bottom sheet on phones and a centred panel on wider screens. Standard buttons remain available for every action; swipe-only interactions would make checkout less discoverable.
+Export a backup before clearing browser data or changing devices. Home-screen apps can have separate storage on some platforms. Installation instructions remain under **Backup & settings → Add to home screen**.
 
-The [web.dev installation guide](https://web.dev/learn/pwa/installation) informed the install flow: native installation where available and explicit platform instructions otherwise. The app shell and font files are precached for offline use after the first successful online load. The camera scanner is loaded on demand to keep the initial wallet smaller.
+The app shell, icons, and fonts are cached for offline use after the first successful online load. Open wallets show a refresh action when an updated version is ready.
 
 ## Deployment
 
-The existing app is available at https://buncard.vercel.app and responds from Vercel. This repository includes Vercel SPA rewrites. Build command: `npm run build`; output: `dist`. These local changes do not publish a deployment. Vercel dashboard access and the current Git integration have not been verified.
-
-## Dependency maintenance
-
-Unused UI, theme, and Tailwind dependencies were removed. npm is the single package manager. All direct dependencies use current stable releases, including TypeScript 7. Oxlint replaces the TypeScript-version-coupled ESLint parser while retaining TypeScript, React, hooks, and accessibility checks. Type checking runs independently with the latest TypeScript compiler during the production build.
+[Production](https://buncard.vercel.app) is hosted on Vercel and deploys from `main`. The build command is `npm run build`, with output in `dist`. `vercel.json` includes SPA routing and revalidation headers for service-worker entry points.

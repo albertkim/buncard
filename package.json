@@ -9,8 +9,7 @@
     "lint": "oxlint --deny-warnings",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md}\"",
-    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,css,md}\"",
-    "test": "playwright test"
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,css,md}\""
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "latest",
@@ -26,7 +25,6 @@
     "sonner": "^2.0.8"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.1",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

@@ -1,0 +1,163 @@
+/* Settings */
+
+.settings-list > button {
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 0;
+  display: flex;
+}
+.settings-list > button > svg:first-child {
+  width: 20px;
+}
+.settings-list > button > svg:last-child {
+  width: 17px;
+  margin-left: auto;
+}
+.settings-list strong {
+  display: block;
+}
+.settings-list small {
+  display: block;
+}
+.settings-list strong {
+  font-size: 13px;
+}
+.settings-list small {
+  color: var(--muted);
+  margin-top: 5px;
+  font-size: 11px;
+}
+.privacy-note {
+  text-align: center;
+  margin-top: 24px;
+  padding: 24px 21px;
+}
+.privacy-note > svg {
+  width: 27px;
+  height: 27px;
+}
+.privacy-note h3 {
+  margin: 10px 0;
+  font-size: 14px;
+}
+.privacy-note p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.source-link {
+  text-align: center;
+  color: #8e9684;
+  margin-top: 23px;
+  font-size: 11px;
+  text-decoration: none;
+  display: block;
+}
+.install-art {
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+  display: flex;
+  position: relative;
+}
+.install-art > svg {
+  position: absolute;
+  top: 10px;
+  left: calc(50% + 47px);
+}
+.install-steps {
+  margin: 24px 0;
+  padding-left: 22px;
+}
+.install-steps li {
+  margin-top: 18px;
+  padding-left: 5px;
+  font-size: 13px;
+}
+.install-steps p {
+  color: #858b7b;
+  margin: 6px 0;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.backup-reminder {
+  padding: 14px;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.privacy-note {
+  background: var(--lime);
+  border: 1px solid var(--ink);
+  border-radius: 10px;
+}
+.privacy-note > svg {
+  color: #4a5238;
+}
+.privacy-note p {
+  color: #4a5238;
+}
+.privacy-note h3 {
+  font-weight: 800;
+}
+.settings-list > button > svg:first-child {
+  color: var(--ink);
+}
+.settings-list > button > svg:last-child {
+  color: var(--ink);
+}
+.settings-list strong {
+  font-weight: 700;
+}
+.install-art .brand-icon {
+  box-shadow: none;
+  background: 0 0;
+  border-radius: 0;
+  width: 90px;
+  height: 90px;
+  transform: rotate(-10deg);
+}
+.install-art > svg {
+  color: var(--accent);
+}
+.install-steps {
+  color: var(--ink);
+}
+.install-steps strong {
+  font-weight: 750;
+}
+.backup-reminder {
+  color: #77776a;
+  background: #ece6d6;
+  border-radius: 6px;
+}
+@media (width<=480px) {
+  .install-art .brand-icon {
+    width: 88px;
+    height: 88px;
+  }
+}
+.settings-list button > svg:last-child {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.settings-list button:hover > svg:last-child {
+  transform: translate(3px);
+}
+.settings-list button {
+  transition:
+    transform 0.15s,
+    background-color 0.15s;
+}
+.settings-list button:active {
+  transform: scale(0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  .settings-list button:active {
+    transform: none;
+  }
+  .settings-list button:hover > svg:last-child {
+    transform: none;
+  }
+}

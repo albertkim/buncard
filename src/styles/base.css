@@ -1,0 +1,99 @@
+/* Shared tokens and browser defaults. */
+:root {
+  --ink: #232528;
+  --paper: #fff9ed;
+  --accent: #ff6738;
+  --lime: #dfff7f;
+  --muted: #77766f;
+  --line: #ded9ce;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: "DM Sans Variable", sans-serif;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background-image: radial-gradient(#23252809 0.65px, transparent 0.65px);
+  background-size: 6px 6px;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+a,
+input,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  min-height: 44px;
+  cursor: pointer;
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+a {
+  color: inherit;
+}
+button,
+a {
+  touch-action: manipulation;
+}
+button svg {
+  flex-shrink: 0;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #789d6c;
+  outline-offset: 4px;
+}
+input:focus,
+select:focus {
+  outline: 2px solid #789d6c;
+  outline-offset: 2px;
+}
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+legend {
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+::selection {
+  background: #d8e1c3;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}

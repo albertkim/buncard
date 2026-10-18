@@ -1,0 +1,460 @@
+/* Cards */
+
+.card-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: grid;
+}
+.wallet-card-wrap {
+  min-width: 0;
+  position: relative;
+}
+.wallet-card {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.card-top {
+  z-index: 1;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+.card-monogram {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+.card-bottom {
+  z-index: 1;
+  position: relative;
+}
+.card-bottom h2 {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin: 0 0 11px;
+  padding-right: 20px;
+  font-family:
+    Manrope Variable,
+    sans-serif;
+  overflow: hidden;
+}
+.card-bottom > span {
+  align-items: center;
+  display: flex;
+}
+.card-decoration {
+  z-index: 0;
+  position: absolute;
+}
+.scan-card {
+  text-align: center;
+  padding: 25px 20px 18px;
+}
+.scan-card h2 {
+  overflow-wrap: anywhere;
+  margin: 14px 0 25px;
+  font-family:
+    Manrope Variable,
+    sans-serif;
+  font-size: 26px;
+}
+.barcode-paper {
+  color: #111;
+  background: #fff;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 185px;
+  padding: 26px 12px 18px;
+  display: flex;
+}
+.barcode-paper svg {
+  max-width: 100%;
+  height: auto;
+}
+.card-number {
+  letter-spacing: 1.5px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  user-select: all;
+  max-width: 100%;
+  margin: 12px 0 0;
+  font-size: 16px;
+}
+.scan-actions {
+  gap: 12px;
+  margin-top: 17px;
+  display: flex;
+}
+.scan-actions button {
+  border: 1px solid #dfe2d7;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  display: flex;
+}
+.delete-button {
+  color: #a17461;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  margin-top: 15px;
+  font-size: 11px;
+  display: flex;
+}
+.code-error {
+  color: #874f3b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+@media (width>=1200px) {
+  .wallet-card {
+    height: 204px;
+  }
+}
+@media (width<=760px) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .card-monogram {
+    width: 36px;
+    height: 36px;
+  }
+}
+@media (width<=480px) {
+  .card-monogram {
+    width: 32px;
+  }
+  .barcode-paper {
+    padding: 22px 8px 18px;
+  }
+  .card-number {
+    font-size: 14px;
+  }
+}
+.card-grid {
+  gap: 23px;
+}
+.wallet-card {
+  text-align: left;
+  color: var(--ink);
+  isolation: isolate;
+  border: 1.5px solid var(--ink);
+  border-radius: 12px;
+  height: 212px;
+  padding: 23px;
+  box-shadow: 3px 4px var(--ink);
+}
+.wallet-card:before {
+  content: "";
+  z-index: 2;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  top: 99px;
+}
+.wallet-card:after {
+  content: "";
+  z-index: 2;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  top: 99px;
+}
+.wallet-card:before {
+  left: -9px;
+}
+.wallet-card:after {
+  right: -9px;
+}
+.card-top {
+  border-bottom: 1px dashed #23252855;
+  padding-bottom: 21px;
+}
+.card-monogram {
+  letter-spacing: -1px;
+  background: 0 0;
+  border: 0;
+  border-radius: 0;
+  width: auto;
+  height: 28px;
+  font-family:
+    Manrope Variable,
+    sans-serif;
+  font-size: 27px;
+  font-weight: 800;
+}
+.card-top > svg {
+  opacity: 1;
+  stroke-width: 1.4px;
+  width: 23px;
+  height: 23px;
+}
+.card-bottom {
+  margin-top: 21px;
+}
+.card-bottom h2 {
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.card-bottom > span {
+  letter-spacing: 1px;
+  opacity: 0.8;
+  font-size: 7px;
+  font-weight: 650;
+}
+.card-decoration {
+  box-shadow: none;
+  opacity: 0.14;
+  background: repeating-linear-gradient(90deg, var(--ink) 0 7px, #0000 7px 14px);
+  border: 0;
+  border-radius: 0;
+  width: 82px;
+  height: 124px;
+  top: -25px;
+  right: 38px;
+  transform: rotate(22deg);
+}
+.wallet-card[data-pattern="1"] .card-decoration {
+  background: 0 0;
+  border: 15px solid var(--ink);
+  border-radius: 50%;
+  width: 110px;
+  height: 110px;
+  top: -23px;
+  right: 32px;
+  transform: none;
+  box-shadow: 0 0 0 9px #23252822;
+}
+.wallet-card[data-pattern="2"] .card-decoration {
+  opacity: 0.15;
+  background: repeating-conic-gradient(var(--ink) 0 25%, transparent 0 50%) 0/26px 26px;
+  width: 95px;
+  height: 95px;
+  top: -10px;
+  right: 44px;
+  transform: rotate(15deg);
+}
+.wallet-card[data-pattern="3"] .card-decoration {
+  background: 0 0;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  top: -35px;
+  right: 35px;
+  box-shadow:
+    0 0 0 10px var(--ink),
+    0 0 0 13px #0000,
+    0 0 0 17px var(--ink);
+}
+.scan-card {
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+  border-radius: 12px;
+}
+.scan-card h2 {
+  letter-spacing: -1px;
+  font-weight: 800;
+}
+.barcode-paper {
+  border: 1px solid var(--ink);
+  border-radius: 7px;
+}
+.scan-actions button {
+  border-color: var(--ink);
+  border-radius: 7px;
+  font-weight: 600;
+}
+@media (width<=760px) {
+  .card-grid {
+    gap: 17px;
+  }
+  .wallet-card {
+    height: 195px;
+    padding: 20px;
+  }
+  .card-monogram {
+    font-size: 25px;
+  }
+  .card-top {
+    padding-bottom: 17px;
+  }
+  .card-bottom {
+    margin-top: 20px;
+  }
+  .card-bottom h2 {
+    font-size: 23px;
+  }
+  .card-bottom > span {
+    letter-spacing: 0.5px;
+    font-size: 6px;
+  }
+  .wallet-card:before {
+    top: 87px;
+  }
+  .wallet-card:after {
+    top: 87px;
+  }
+}
+@media (width<=480px) {
+  .card-grid {
+    gap: 16px 13px;
+  }
+  .wallet-card {
+    border-radius: 10px;
+    height: 183px;
+    padding: 16px 15px;
+    box-shadow: 2px 3px var(--ink);
+  }
+  .card-monogram {
+    height: 29px;
+    font-size: 24px;
+  }
+  .card-top {
+    padding-bottom: 15px;
+  }
+  .card-top > svg {
+    width: 20px;
+    height: 20px;
+  }
+  .card-bottom {
+    margin-top: 21px;
+  }
+  .card-bottom h2 {
+    letter-spacing: -0.8px;
+    white-space: normal;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    height: 44px;
+    margin-bottom: 8px;
+    padding-right: 0;
+    font-size: 21px;
+    line-height: 1.05;
+    display: -webkit-box;
+    overflow: hidden;
+  }
+  .card-bottom > span {
+    letter-spacing: 0.3px;
+    font-size: 5px;
+  }
+  .card-bottom > span > svg {
+    width: 12px;
+  }
+  .wallet-card:before {
+    width: 12px;
+    height: 12px;
+    top: 76px;
+  }
+  .wallet-card:after {
+    width: 12px;
+    height: 12px;
+    top: 76px;
+  }
+  .wallet-card:before {
+    left: -8px;
+  }
+  .wallet-card:after {
+    right: -8px;
+  }
+  .card-decoration {
+    width: 52px;
+    height: 103px;
+    top: -27px;
+    right: 30px;
+  }
+  .wallet-card[data-pattern="1"] .card-decoration {
+    border-width: 11px;
+    width: 80px;
+    height: 80px;
+    top: -28px;
+    right: 19px;
+  }
+  .wallet-card[data-pattern="2"] .card-decoration {
+    width: 67px;
+    height: 67px;
+    right: 20px;
+  }
+  .wallet-card[data-pattern="3"] .card-decoration {
+    width: 74px;
+    height: 74px;
+    right: 20px;
+  }
+  .scan-card {
+    padding: 24px 15px 18px;
+  }
+  .scan-card h2 {
+    font-size: 28px;
+  }
+  .barcode-paper {
+    border: 0;
+    border-radius: 5px;
+  }
+  .scan-actions button {
+    font-size: 11px;
+  }
+}
+@media (width<=350px) {
+  .card-bottom h2 {
+    font-size: 18px;
+  }
+  .card-bottom > span {
+    font-size: 4px;
+  }
+}
+.card-bottom > span {
+  justify-content: flex-end;
+}
+.scan-card h2 {
+  margin-top: 0;
+}
+.card-celebration {
+  z-index: 5;
+  color: var(--accent);
+  pointer-events: none;
+  filter: drop-shadow(0 1px var(--paper));
+  position: absolute;
+  top: -8px;
+  right: 12px;
+}
+.scan-actions svg {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.scan-actions button:hover svg {
+  transform: translate(3px);
+}
+.scan-actions button {
+  transition:
+    transform 0.15s,
+    background-color 0.15s;
+}
+.scan-actions button:active {
+  transform: scale(0.97);
+}
+.wallet-card:hover .card-decoration {
+  opacity: 0.23;
+}
+.card-decoration {
+  transition: opacity 0.25s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scan-actions button:active {
+    transform: none;
+  }
+  .scan-actions button:hover svg {
+    transform: none;
+  }
+}

@@ -22,8 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-repomix-output.txt
-
-playwright-report
-test-results

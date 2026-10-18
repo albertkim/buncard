@@ -1,0 +1,85 @@
+/* Controls */
+
+.icon-button {
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  display: flex;
+}
+.primary {
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  padding: 0 19px;
+  font-size: 13px;
+  display: flex;
+}
+.error {
+  color: #914a30;
+  background: #f8e6df;
+  border-radius: 9px;
+  margin: 0;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.storage-error {
+  margin-bottom: 24px;
+}
+.storage-error button {
+  text-decoration: underline;
+  display: block;
+}
+.text-button {
+  font-size: 13px;
+  text-decoration: underline;
+}
+.icon-button {
+  background: 0 0;
+  border: 1px solid var(--ink);
+  border-radius: 12px;
+}
+.primary {
+  color: var(--ink);
+  background: var(--accent);
+  border: 1.5px solid var(--ink);
+  border-radius: 8px;
+  min-height: 45px;
+  font-weight: 750;
+  transition:
+    transform 0.16s,
+    box-shadow 0.16s;
+  box-shadow: 3px 3px var(--ink);
+}
+.primary:hover {
+  background: #ff825b;
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px var(--ink);
+}
+.primary:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 var(--ink);
+}
+.primary svg {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.primary:hover svg {
+  transform: rotate(9deg);
+}
+.icon-button {
+  transition:
+    transform 0.15s,
+    background-color 0.15s;
+}
+.icon-button:active {
+  transform: scale(0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  .icon-button:active {
+    transform: none;
+  }
+  .primary:hover svg {
+    transform: none;
+  }
+}
