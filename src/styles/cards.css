@@ -472,3 +472,18 @@
 .barcode-graphic svg {
   max-height: 100%;
 }
+
+.card-drag-overlay {
+  pointer-events: none;
+  cursor: grabbing;
+}
+.card-lifted {
+  transform: scale(1.04) rotate(1.5deg);
+  box-shadow: 7px 12px 0 #23252833;
+  cursor: grabbing;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-lifted {
+    transform: none;
+  }
+}

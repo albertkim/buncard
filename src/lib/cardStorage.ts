@@ -1,4 +1,4 @@
-import { isCardData, normalizeCard } from "../domain/cards"
+import { compareCardOrder, isCardData, normalizeCard } from "../domain/cards"
 import type { Card } from "../domain/cards"
 
 export const STORAGE_KEY = "buncard-cards"
@@ -11,7 +11,7 @@ export function loadCards(): { cards: Card[]; error: string | null } {
     if (!raw) return { cards: [], error: null }
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed) || !parsed.every(isCardData)) throw new Error("Invalid saved cards")
-    return { cards: parsed.map(normalizeCard), error: null }
+    return { cards: parsed.map(normalizeCard).sort(compareCardOrder), error: null }
   } catch {
     return {
       cards: [],

@@ -42,6 +42,7 @@ export default function App() {
       <div className="app-shell" data-reduced-motion={reduced || undefined}>
         <Wallet
           cards={wallet.cards}
+          onReorder={wallet.reorderCards}
           storageError={wallet.storageError}
           celebrating={celebrating}
           onAdd={() => setView({ type: "add" })}

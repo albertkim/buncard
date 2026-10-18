@@ -1,7 +1,8 @@
 import { useState } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-import { ChevronRight, Plus, ScanLine, Search, Smartphone, Sparkles, X } from "lucide-react"
+import { motion, useReducedMotion } from "motion/react"
+import { ChevronRight, Plus, Search, Smartphone, Sparkles, X } from "lucide-react"
 import type { Card } from "../../domain/cards"
+import { CardGrid } from "./CardGrid"
 
 interface WalletProps {
   cards: Card[]
@@ -13,6 +14,7 @@ interface WalletProps {
   onExport: () => void
   showInstall: boolean
   onInstall: () => void
+  onReorder: (ids: string[]) => boolean
 }
 
 export function Wallet({
@@ -25,12 +27,11 @@ export function Wallet({
   onExport,
   showInstall,
   onInstall,
+  onReorder,
 }: WalletProps) {
   const [query, setQuery] = useState("")
   const reduced = useReducedMotion()
-  const visible = cards
-    .filter((card) => card.name.toLowerCase().includes(query.toLowerCase()))
-    .sort((a, b) => b.createdAt - a.createdAt)
+  const visible = cards.filter((card) => card.name.toLowerCase().includes(query.toLowerCase()))
   return (
     <main>
       <div className="wallet-heading">
@@ -81,62 +82,13 @@ export function Wallet({
             )}
           </div>
         )}
-        <motion.div className="card-grid" layout>
-          <AnimatePresence mode="popLayout">
-            {visible.map((card, index) => (
-              <motion.div
-                layout
-                key={card.id}
-                initial={{ opacity: 0, y: reduced ? 0 : 24, scale: reduced ? 1 : 0.93 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: reduced ? 0 : 8, scale: reduced ? 1 : 0.86 }}
-                transition={{ type: "spring", stiffness: 330, damping: 28, delay: Math.min(index * 0.035, 0.2) }}
-                className="wallet-card-wrap"
-              >
-                {celebrating === card.id && !reduced && (
-                  <motion.span
-                    className="card-celebration"
-                    aria-hidden="true"
-                    initial={{ opacity: 0, scale: 0.3, y: 10, rotate: -25 }}
-                    animate={{
-                      opacity: [0, 1, 1, 0],
-                      scale: [0.3, 1.25, 1, 0.7],
-                      y: [10, -12, -23, -35],
-                      rotate: [-25, 10, 20, 30],
-                    }}
-                    transition={{ duration: 0.9 }}
-                  >
-                    <Sparkles size={30} />
-                  </motion.span>
-                )}
-                <motion.button
-                  className="wallet-card"
-                  data-pattern={Array.from(card.name).reduce((n, c) => n + c.charCodeAt(0), 0) % 4}
-                  style={{ background: card.backgroundColor }}
-                  whileHover={reduced ? undefined : { y: -6, rotate: -1.2 }}
-                  whileTap={reduced ? undefined : { scale: 0.95, rotate: 0.6 }}
-                  transition={{ type: "spring", stiffness: 420, damping: 23 }}
-                  onClick={() => {
-                    onOpen(card.id)
-                  }}
-                  aria-label={`Open ${card.name}`}
-                >
-                  <div className="card-top">
-                    <span className="card-monogram">{card.name.slice(0, 1).toUpperCase()}</span>
-                    <ScanLine size={20} />
-                  </div>
-                  <div className="card-bottom">
-                    <h2>{card.name}</h2>
-                    <span>
-                      <ChevronRight size={16} />
-                    </span>
-                  </div>
-                  <div className="card-decoration" />
-                </motion.button>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+        <CardGrid
+          cards={visible}
+          celebrating={celebrating}
+          disabled={!!storageError}
+          onOpen={onOpen}
+          onReorder={onReorder}
+        />
         {visible.length === 0 && (
           <motion.div
             className="empty-state"

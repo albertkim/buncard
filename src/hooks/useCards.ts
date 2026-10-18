@@ -22,8 +22,9 @@ export function useCards() {
       return false
     }
     try {
-      storeCards(next)
-      setWallet({ cards: next, error: null })
+      const ordered = next.map((card, position) => ({ ...card, position }))
+      storeCards(ordered)
+      setWallet({ cards: ordered, error: null })
       return true
     } catch {
       toast.error("Could not save. Your device storage may be full. Export a backup to keep your cards safe.")
@@ -33,13 +34,14 @@ export function useCards() {
 
   function saveCard(card: Card) {
     const editing = cards.some((existing) => existing.id === card.id)
-    const next = editing ? cards.map((existing) => (existing.id === card.id ? card : existing)) : [...cards, card]
+    const next = editing ? cards.map((existing) => (existing.id === card.id ? card : existing)) : [card, ...cards]
     if (!persist(next)) return false
     toast.success(editing ? "Card updated" : "Card added")
     return true
   }
 
   function deleteCard(card: Card) {
+    const removedPosition = cards.findIndex((existing) => existing.id === card.id)
     if (!persist(cards.filter((existing) => existing.id !== card.id))) return false
     toast("Card removed", {
       action: {
@@ -49,7 +51,10 @@ export function useCards() {
           const latest = loadCards()
           if (latest.error) return
           try {
-            const next = [...latest.cards, card]
+            if (latest.cards.some((existing) => existing.id === card.id)) return
+            const restored = [...latest.cards]
+            restored.splice(Math.min(removedPosition, restored.length), 0, card)
+            const next = restored.map((item, position) => ({ ...item, position }))
             storeCards(next)
             setWallet({ cards: next, error: null })
           } catch {
@@ -80,10 +85,20 @@ export function useCards() {
     }
   }
 
+  function reorderCards(ids: string[]) {
+    const reordered = new Set(ids)
+    if (reordered.size !== ids.length || ids.some((id) => !cards.some((card) => card.id === id))) return false
+    const byId = new Map(cards.map((card) => [card.id, card]))
+    let index = 0
+    // Only replace matching slots when the wallet is filtered; hidden cards stay put.
+    const next = cards.map((card) => (reordered.has(card.id) ? byId.get(ids[index++])! : card))
+    return persist(next)
+  }
+
   function exportCards() {
     downloadBackup(cards)
     toast.success("Backup exported")
   }
 
-  return { cards, storageError: error, saveCard, deleteCard, importCards, exportCards }
+  return { cards, storageError: error, saveCard, deleteCard, importCards, exportCards, reorderCards }
 }

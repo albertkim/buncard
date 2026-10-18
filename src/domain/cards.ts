@@ -6,6 +6,7 @@ export interface Card {
   backgroundColor: string
   createdAt: number
   updatedAt: number
+  position?: number
 }
 
 export type CardData = Pick<Card, "name" | "barcode" | "barcodeType" | "backgroundColor">
@@ -45,8 +46,13 @@ export function isCardData(value: unknown): value is CardData & Partial<Card> {
 export function normalizeCard(card: CardData & Partial<Card>): Card {
   return {
     ...card,
+    position: typeof card.position === "number" && Number.isFinite(card.position) ? card.position : undefined,
     id: typeof card.id === "string" ? card.id : crypto.randomUUID(),
     createdAt: typeof card.createdAt === "number" && card.createdAt ? card.createdAt : Date.now(),
     updatedAt: typeof card.updatedAt === "number" && card.updatedAt ? card.updatedAt : Date.now(),
   }
+}
+
+export function compareCardOrder(a: Card, b: Card) {
+  return (a.position ?? Infinity) - (b.position ?? Infinity) || b.createdAt - a.createdAt
 }
