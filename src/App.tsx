@@ -29,13 +29,11 @@ interface InstallEvent extends Event {
 }
 function Sheet({
   title,
-  description,
   children,
   onClose,
   wide = false,
 }: {
   title: string
-  description?: string
   children: ReactNode
   onClose: () => void
   wide?: boolean
@@ -49,15 +47,11 @@ function Sheet({
     >
       <Dialog.Portal>
         <Dialog.Overlay className="scrim" />
-        <Dialog.Content
-          className={`sheet ${wide ? "scan-sheet" : ""}`}
-          {...(!description ? { "aria-describedby": undefined } : {})}
-        >
+        <Dialog.Content className={`sheet ${wide ? "scan-sheet" : ""}`} aria-describedby={undefined}>
           <div className="sheet-handle" />
           <div className="sheet-heading">
             <div>
               <Dialog.Title>{title}</Dialog.Title>
-              {description && <Dialog.Description>{description}</Dialog.Description>}
             </div>
             <Dialog.Close className="icon-button" aria-label="Close">
               <X size={20} />
@@ -114,14 +108,10 @@ function CardForm({
       onClose()
   }
   return (
-    <Sheet
-      title={card ? "A little refresh" : "Meet your next card"}
-      description={card ? undefined : "Scan a barcode, or enter the number below."}
-      onClose={onClose}
-    >
+    <Sheet title={card ? "Edit card" : "Add card"} onClose={onClose}>
       <form onSubmit={submit} className="card-form">
         <div className="mini-preview" style={{ background: color }}>
-          <span>{name || "Your lovely new card"}</span>
+          <span>{name || "New card"}</span>
           <img className="preview-bun" src="/bun.svg" alt="" />
         </div>
         <button type="button" className="scan-button" onClick={() => setScanning(!scanning)}>
@@ -144,33 +134,20 @@ function CardForm({
                     setType(format === 11 ? "qr" : format === 7 ? "ean13" : "code128")
                     setScanning(false)
                     setError("")
-                    toast.success("Got it! Your card is scanned.")
+                    toast.success("Scanned")
                   }
                 }}
               />
             </Suspense>
-            <p>Hold the barcode steady inside the camera.</p>
           </div>
         )}
         <label>
           Card name
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Your favourite coffee spot"
-            maxLength={70}
-            required
-          />
+          <input value={name} onChange={(e) => setName(e.target.value)} maxLength={70} required />
         </label>
         <label>
           Card number
-          <input
-            value={barcode}
-            onChange={(e) => setBarcode(e.target.value)}
-            placeholder="The number below your barcode"
-            maxLength={2048}
-            required
-          />
+          <input value={barcode} onChange={(e) => setBarcode(e.target.value)} maxLength={2048} required />
         </label>
         <label>
           Code format
@@ -181,7 +158,7 @@ function CardForm({
           </select>
         </label>
         <fieldset>
-          <legend>Pick a little personality</legend>
+          <legend>Color</legend>
           <div className="swatches">
             {COLORS.map((c, i) => (
               <button
@@ -284,7 +261,7 @@ function App() {
     const success = persist(
       cards.some((c) => c.id === card.id) ? cards.map((c) => (c.id === card.id ? card : c)) : [...cards, card]
     )
-    if (success) toast.success(editing ? "Looking good. Card updated." : "A new card, a lighter wallet.")
+    if (success) toast.success(editing ? "Card updated" : "Card added")
     return success
   }
   async function importCards(input: HTMLInputElement) {
@@ -339,18 +316,7 @@ function App() {
               </button>
             )}
           </div>
-          {cards.length === 0 ? (
-            <section className="intro">
-              <h1>
-                <span className="heading-lead">Less wallet.</span>
-                <br />
-                <span>More life.</span>
-                <Sparkles className="heading-spark" strokeWidth={1.3} />
-              </h1>
-            </section>
-          ) : (
-            <h1 className="sr-only">Your wallet</h1>
-          )}
+          <h1 className="sr-only">Your wallet</h1>
           {storageError && (
             <div className="error storage-error" role="alert">
               {storageError}
@@ -426,7 +392,6 @@ function App() {
                       </span>
                       <Sparkles className="empty-spark" size={30} />
                     </div>
-                    <h2>Goodbye, bulky wallet.</h2>
                     <button className="primary" onClick={() => setPanel("add")}>
                       <Plus size={18} />
                       Add your first card
@@ -436,7 +401,6 @@ function App() {
                   <>
                     <Search size={32} />
                     <h2>No cards found</h2>
-                    <p>Try another name.</p>
                     {query && (
                       <button className="text-button" onClick={() => setQuery("")}>
                         Clear search
@@ -464,17 +428,12 @@ function App() {
         {selectedCard && !editing && (
           <Sheet title={selectedCard.name} onClose={() => setSelected(null)} wide>
             <div className="scan-card" style={{ background: selectedCard.backgroundColor }}>
-              <h2>{selectedCard.name}</h2>
               <div className="barcode-paper">
                 <Suspense fallback={<p>Getting your card ready…</p>}>
                   <Code card={selectedCard} />
                 </Suspense>
                 <p className="card-number">{selectedCard.barcode}</p>
               </div>
-              <p className="scan-hint">
-                <ScanLine size={16} />
-                Show this at the checkout
-              </p>
             </div>
             <div className="scan-actions">
               <button
@@ -544,7 +503,7 @@ function App() {
               <button
                 onClick={() => {
                   downloadBackup(cards)
-                  toast.success("Your backup is ready")
+                  toast.success("Backup exported")
                 }}
                 disabled={!cards.length && !storageError}
               >
@@ -564,14 +523,10 @@ function App() {
             </div>
             <div className="privacy-note">
               <ShieldCheck />
-              <h3>Just you and your cards.</h3>
-              <p>
-                Your cards stay in this browser on this device. No account, no tracking, no ads. Export a backup before
-                clearing browser data or moving to a new phone.
-              </p>
+              <p>Cards are saved in this browser. Export a backup before clearing browser data or switching devices.</p>
             </div>
             <a className="source-link" href="https://github.com/albertkim/buncard" target="_blank" rel="noreferrer">
-              Made with care. Open source. ↗
+              Source code ↗
             </a>
           </Sheet>
         )}
@@ -591,7 +546,7 @@ function App() {
                   const choice = await install.userChoice
                   setInstall(null)
                   if (choice.outcome === "accepted") {
-                    toast.success("Welcome home, Buncard.")
+                    toast.success("Installed")
                     close()
                   }
                 }}

@@ -10,7 +10,7 @@ const legacy = {
 }
 test("add, persist, search, edit, remove, undo", async ({ page }) => {
   await page.goto("/")
-  await expect(page.getByText("Goodbye, bulky wallet.")).toBeVisible()
+  await expect(page.getByRole("button", { name: "Add your first card" })).toBeVisible()
   await page.getByRole("button", { name: "Add your first card" }).click()
   await page.getByLabel("Card name", { exact: true }).fill("Coffee club")
   await page.getByLabel("Card number", { exact: true }).fill("123456789")
@@ -31,7 +31,7 @@ test("add, persist, search, edit, remove, undo", async ({ page }) => {
   await expect(page.getByRole("dialog")).toContainText("Coffee perks")
   await page.getByRole("button", { name: "Remove card", exact: true }).click()
   await page.getByRole("button", { name: "Tap again to remove this card" }).click()
-  await expect(page.getByText("Goodbye, bulky wallet.")).toBeVisible()
+  await expect(page.getByRole("button", { name: "Add your first card" })).toBeVisible()
   await page.getByRole("button", { name: "Undo", exact: true }).click()
   await expect(page.getByRole("button", { name: "Open Coffee perks" })).toBeVisible()
 })
