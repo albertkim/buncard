@@ -26,7 +26,7 @@ export default function App() {
   useEffect(() => () => clearTimeout(celebrationTimer.current), [])
 
   function close() {
-    setView(view.type === "edit" ? { type: "card", id: view.id } : { type: "wallet" })
+    setView({ type: "wallet" })
   }
 
   function save(card: Card) {
