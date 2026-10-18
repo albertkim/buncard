@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 repomix-output.txt
+
+playwright-report
+test-results
