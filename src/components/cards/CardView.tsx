@@ -35,7 +35,7 @@ export function CardView({
               await navigator.clipboard.writeText(card.barcode)
               toast.success("Card number copied")
             } catch {
-              toast.error("Could not copy. You can select the number above.")
+              toast.error("Could not copy. Try again.")
             }
           }}
         >
