@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react"
 import type { FormEvent, ReactNode } from "react"
 import * as Dialog from "@radix-ui/react-dialog"
-import { AnimatePresence, motion, MotionConfig } from "motion/react"
+import { AnimatePresence, motion, MotionConfig, useIsPresent, useReducedMotion } from "motion/react"
 import {
   ArrowDownToLine,
   ArrowUpFromLine,
@@ -38,27 +38,57 @@ function Sheet({
   onClose: () => void
   wide?: boolean
 }) {
+  const [returnFocus] = useState(() => (document.activeElement instanceof HTMLElement ? document.activeElement : null))
+  const present = useIsPresent()
+  const reduced = useReducedMotion()
   return (
     <Dialog.Root
-      open
+      open={present}
       onOpenChange={(open) => {
         if (!open) onClose()
       }}
     >
-      <Dialog.Portal>
-        <Dialog.Overlay className="scrim" />
-        <Dialog.Content className={`sheet ${wide ? "scan-sheet" : ""}`} aria-describedby={undefined}>
-          <div className="sheet-handle" />
-          <div className="sheet-heading">
-            <div>
-              <Dialog.Title>{title}</Dialog.Title>
-            </div>
-            <Dialog.Close className="icon-button" aria-label="Close">
-              <X size={20} />
-            </Dialog.Close>
-          </div>
-          {children}
-        </Dialog.Content>
+      <Dialog.Portal forceMount>
+        <Dialog.Overlay forceMount asChild>
+          <motion.div
+            className="scrim"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+          />
+        </Dialog.Overlay>
+        <div className="sheet-position">
+          <Dialog.Content
+            forceMount
+            asChild
+            aria-describedby={undefined}
+            onCloseAutoFocus={(event) => {
+              event.preventDefault()
+              if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true })
+            }}
+          >
+            <motion.div
+              className={`sheet ${wide ? "scan-sheet" : ""}`}
+              initial={{ opacity: 0, y: reduced ? 0 : 56, scale: reduced ? 1 : 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: reduced ? 0 : 28, scale: reduced ? 1 : 0.98 }}
+              transition={{ type: "spring", stiffness: 420, damping: 34, opacity: { duration: 0.16 } }}
+              style={{ pointerEvents: present ? "auto" : "none" }}
+            >
+              <div className="sheet-handle" />
+              <div className="sheet-heading">
+                <div>
+                  <Dialog.Title>{title}</Dialog.Title>
+                </div>
+                <Dialog.Close className="icon-button" aria-label="Close">
+                  <X size={20} />
+                </Dialog.Close>
+              </div>
+              {children}
+            </motion.div>
+          </Dialog.Content>
+        </div>
       </Dialog.Portal>
     </Dialog.Root>
   )
@@ -110,37 +140,56 @@ function CardForm({
   return (
     <Sheet title={card ? "Edit card" : "Add card"} onClose={onClose}>
       <form onSubmit={submit} className="card-form">
-        <div className="mini-preview" style={{ background: color }}>
+        <motion.div className="mini-preview" animate={{ backgroundColor: color }} transition={{ duration: 0.3 }}>
           <span>{name || "New card"}</span>
-          <img className="preview-bun" src="/bun.svg" alt="" />
-        </div>
+          <motion.img
+            className="preview-bun"
+            src="/bun.svg"
+            alt=""
+            key={color}
+            initial={{ rotate: -14, scale: 0.85 }}
+            animate={{ rotate: 9, scale: 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 14 }}
+          />
+        </motion.div>
         <button type="button" className="scan-button" onClick={() => setScanning(!scanning)}>
           <ScanLine size={20} />
           {scanning ? "Stop camera" : "Scan a card"}
           <ChevronRight size={18} />
         </button>
-        {scanning && (
-          <div className="camera">
-            <Suspense fallback={<p>Starting camera…</p>}>
-              <Scanner
-                onError={() => {
-                  setError("Camera unavailable. Check camera permissions or enter your number below.")
-                  setScanning(false)
-                }}
-                onUpdate={(_error, result) => {
-                  if (result) {
-                    setBarcode(result.getText())
-                    const format = result.getBarcodeFormat()
-                    setType(format === 11 ? "qr" : format === 7 ? "ean13" : "code128")
+        <AnimatePresence initial={false}>
+          {scanning && (
+            <motion.div
+              className="camera"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.22 }}
+            >
+              <div className="camera-frame" aria-hidden="true">
+                <span />
+              </div>
+              <Suspense fallback={<p>Starting camera…</p>}>
+                <Scanner
+                  onError={() => {
+                    setError("Camera unavailable. Check camera permissions or enter your number below.")
                     setScanning(false)
-                    setError("")
-                    toast.success("Scanned")
-                  }
-                }}
-              />
-            </Suspense>
-          </div>
-        )}
+                  }}
+                  onUpdate={(_error, result) => {
+                    if (result) {
+                      setBarcode(result.getText())
+                      const format = result.getBarcodeFormat()
+                      setType(format === 11 ? "qr" : format === 7 ? "ean13" : "code128")
+                      setScanning(false)
+                      setError("")
+                      toast.success("Scanned")
+                    }
+                  }}
+                />
+              </Suspense>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <label>
           Card name
           <input value={name} onChange={(e) => setName(e.target.value)} maxLength={70} required />
@@ -161,8 +210,12 @@ function CardForm({
           <legend>Color</legend>
           <div className="swatches">
             {COLORS.map((c, i) => (
-              <button
+              <motion.button
                 type="button"
+                whileHover={{ scale: 1.12, y: -2 }}
+                whileTap={{ scale: 0.88 }}
+                animate={{ scale: color === c ? 1.08 : 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 23 }}
                 aria-label={`Color ${i + 1}`}
                 aria-pressed={color === c}
                 className="swatch"
@@ -170,16 +223,39 @@ function CardForm({
                 style={{ background: c }}
                 onClick={() => setColor(c)}
               >
-                {color === c && <Check size={18} />}
-              </button>
+                <AnimatePresence>
+                  {color === c && (
+                    <motion.span
+                      key="check"
+                      className="swatch-check"
+                      initial={{ scale: 0, rotate: -45 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      exit={{ scale: 0 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <Check size={18} />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.button>
             ))}
           </div>
         </fieldset>
-        {error && (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        )}
+        <AnimatePresence initial={false}>
+          {error && (
+            <motion.p
+              className="error"
+              role="alert"
+              key={error}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.16 }}
+            >
+              {error}
+            </motion.p>
+          )}
+        </AnimatePresence>
         <button className="primary" type="submit">
           <Check size={18} />
           {card ? "Save changes" : "Add to my wallet"}
@@ -193,6 +269,8 @@ function App() {
   const [cards, setCards] = useState(initial.cards)
   const [storageError, setStorageError] = useState(initial.error)
   const [query, setQuery] = useState("")
+  const [celebrating, setCelebrating] = useState<string | null>(null)
+  const reduced = useReducedMotion()
   const [panel, setPanel] = useState<"add" | "settings" | "install" | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [editing, setEditing] = useState<Card | undefined>()
@@ -261,7 +339,11 @@ function App() {
     const success = persist(
       cards.some((c) => c.id === card.id) ? cards.map((c) => (c.id === card.id ? card : c)) : [...cards, card]
     )
-    if (success) toast.success(editing ? "Card updated" : "Card added")
+    if (success) {
+      toast.success(editing ? "Card updated" : "Card added")
+      setCelebrating(card.id)
+      window.setTimeout(() => setCelebrating((current) => (current === card.id ? null : current)), 1000)
+    }
     return success
   }
   async function importCards(input: HTMLInputElement) {
@@ -297,7 +379,7 @@ function App() {
   }
   return (
     <MotionConfig reducedMotion="user">
-      <div className="app-shell">
+      <div className="app-shell" data-reduced-motion={reduced || undefined}>
         <main>
           <div className="wallet-heading">
             <div className="brand" aria-label="Buncard">
@@ -346,18 +428,35 @@ function App() {
                   <motion.div
                     layout
                     key={card.id}
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.94 }}
+                    initial={{ opacity: 0, y: reduced ? 0 : 24, scale: reduced ? 1 : 0.93 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: reduced ? 0 : 8, scale: reduced ? 1 : 0.86 }}
                     transition={{ type: "spring", stiffness: 330, damping: 28, delay: Math.min(index * 0.035, 0.2) }}
                     className="wallet-card-wrap"
                   >
+                    {celebrating === card.id && !reduced && (
+                      <motion.span
+                        className="card-celebration"
+                        aria-hidden="true"
+                        initial={{ opacity: 0, scale: 0.3, y: 10, rotate: -25 }}
+                        animate={{
+                          opacity: [0, 1, 1, 0],
+                          scale: [0.3, 1.25, 1, 0.7],
+                          y: [10, -12, -23, -35],
+                          rotate: [-25, 10, 20, 30],
+                        }}
+                        transition={{ duration: 0.9 }}
+                      >
+                        <Sparkles size={30} />
+                      </motion.span>
+                    )}
                     <motion.button
                       className="wallet-card"
                       data-pattern={Array.from(card.name).reduce((n, c) => n + c.charCodeAt(0), 0) % 4}
                       style={{ background: card.backgroundColor }}
-                      whileHover={{ y: -5, rotate: -0.6 }}
-                      whileTap={{ scale: 0.97 }}
+                      whileHover={reduced ? undefined : { y: -6, rotate: -1.2 }}
+                      whileTap={reduced ? undefined : { scale: 0.95, rotate: 0.6 }}
+                      transition={{ type: "spring", stiffness: 420, damping: 23 }}
                       onClick={() => {
                         setSelected(card.id)
                         setConfirmDelete(false)
@@ -381,7 +480,13 @@ function App() {
               </AnimatePresence>
             </motion.div>
             {visible.length === 0 && (
-              <div className="empty-state">
+              <motion.div
+                className="empty-state"
+                key={cards.length === 0 ? "empty-wallet" : "empty-search"}
+                initial={{ opacity: 0, y: reduced ? 0 : 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.22 }}
+              >
                 {cards.length === 0 ? (
                   <>
                     <div className="empty-illustration">
@@ -408,7 +513,7 @@ function App() {
                     )}
                   </>
                 )}
-              </div>
+              </motion.div>
             )}
           </section>
           <div className="wallet-utilities">
@@ -424,156 +529,175 @@ function App() {
           hidden
           onChange={(e) => void importCards(e.target)}
         />
-        {(panel === "add" || editing) && <CardForm card={editing} cards={cards} onSave={save} onClose={close} />}
-        {selectedCard && !editing && (
-          <Sheet title={selectedCard.name} onClose={() => setSelected(null)} wide>
-            <div className="scan-card" style={{ background: selectedCard.backgroundColor }}>
-              <div className="barcode-paper">
-                <Suspense fallback={<p>Getting your card ready…</p>}>
-                  <Code card={selectedCard} />
-                </Suspense>
-                <p className="card-number">{selectedCard.barcode}</p>
+        <AnimatePresence mode="wait">
+          {(panel === "add" || editing) && (
+            <CardForm
+              key={editing ? `edit-${editing.id}` : "add"}
+              card={editing}
+              cards={cards}
+              onSave={save}
+              onClose={close}
+            />
+          )}
+          {selectedCard && !editing && (
+            <Sheet key={`card-${selectedCard.id}`} title={selectedCard.name} onClose={() => setSelected(null)} wide>
+              <motion.div
+                className="scan-card"
+                style={{ background: selectedCard.backgroundColor }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1, duration: 0.2 }}
+              >
+                <div className="barcode-paper">
+                  <Suspense fallback={<p>Getting your card ready…</p>}>
+                    <Code card={selectedCard} />
+                  </Suspense>
+                  <p className="card-number">{selectedCard.barcode}</p>
+                </div>
+              </motion.div>
+              <div className="scan-actions">
+                <button
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(selectedCard.barcode)
+                      toast.success("Card number copied")
+                    } catch {
+                      toast.error("Could not copy. You can select the number above.")
+                    }
+                  }}
+                >
+                  <Copy size={17} />
+                  Copy number
+                </button>
+                <button onClick={() => setEditing(selectedCard)}>
+                  Edit card
+                  <ChevronRight size={17} />
+                </button>
               </div>
-            </div>
-            <div className="scan-actions">
               <button
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(selectedCard.barcode)
-                    toast.success("Card number copied")
-                  } catch {
-                    toast.error("Could not copy. You can select the number above.")
-                  }
-                }}
-              >
-                <Copy size={17} />
-                Copy number
-              </button>
-              <button onClick={() => setEditing(selectedCard)}>
-                Edit card
-                <ChevronRight size={17} />
-              </button>
-            </div>
-            <button
-              className="delete-button"
-              onClick={() => {
-                if (!confirmDelete) return setConfirmDelete(true)
-                if (persist(cards.filter((c) => c.id !== selectedCard.id))) {
-                  const removed = selectedCard
-                  setSelected(null)
-                  toast("Card removed", {
-                    action: {
-                      label: "Undo",
-                      onClick: () => {
-                        const latest = loadCards()
-                        if (!latest.error) {
-                          try {
-                            const next = [...latest.cards, removed]
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-                            setCards(next)
-                          } catch {
-                            toast.error("Could not restore card")
+                className="delete-button"
+                onClick={() => {
+                  if (!confirmDelete) return setConfirmDelete(true)
+                  if (persist(cards.filter((c) => c.id !== selectedCard.id))) {
+                    const removed = selectedCard
+                    setSelected(null)
+                    toast("Card removed", {
+                      action: {
+                        label: "Undo",
+                        onClick: () => {
+                          const latest = loadCards()
+                          if (!latest.error) {
+                            try {
+                              const next = [...latest.cards, removed]
+                              localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+                              setCards(next)
+                            } catch {
+                              toast.error("Could not restore card")
+                            }
                           }
-                        }
+                        },
                       },
-                    },
-                  })
-                }
-              }}
-            >
-              <Trash2 size={15} />
-              {confirmDelete ? "Tap again to remove this card" : "Remove card"}
-            </button>
-          </Sheet>
-        )}
-        {panel === "settings" && (
-          <Sheet title="Your wallet" onClose={close}>
-            <div className="settings-list">
-              <button
-                onClick={() => {
-                  file.current?.click()
-                }}
-              >
-                <ArrowUpFromLine />
-                <span>
-                  <strong>Import cards</strong>
-                </span>
-                <ChevronRight />
-              </button>
-              <button
-                onClick={() => {
-                  downloadBackup(cards)
-                  toast.success("Backup exported")
-                }}
-                disabled={!cards.length && !storageError}
-              >
-                <ArrowDownToLine />
-                <span>
-                  <strong>Export a backup</strong>
-                </span>
-                <ChevronRight />
-              </button>
-              <button onClick={() => setPanel("install")}>
-                <Smartphone />
-                <span>
-                  <strong>Add to home screen</strong>
-                </span>
-                <ChevronRight />
-              </button>
-            </div>
-            <div className="privacy-note">
-              <ShieldCheck />
-              <p>Cards are saved in this browser. Export a backup before clearing browser data or switching devices.</p>
-            </div>
-            <a className="source-link" href="https://github.com/albertkim/buncard" target="_blank" rel="noreferrer">
-              Source code ↗
-            </a>
-          </Sheet>
-        )}
-        {panel === "install" && (
-          <Sheet title="Add to home screen" onClose={close}>
-            <div className="install-art">
-              <span className="brand-icon">
-                <img src="/bun.svg" alt="" />
-              </span>
-              <Sparkles size={25} />
-            </div>
-            {install ? (
-              <button
-                className="primary"
-                onClick={async () => {
-                  await install.prompt()
-                  const choice = await install.userChoice
-                  setInstall(null)
-                  if (choice.outcome === "accepted") {
-                    toast.success("Installed")
-                    close()
+                    })
                   }
                 }}
               >
-                Add to home screen
-                <Plus size={18} />
+                <Trash2 size={15} />
+                {confirmDelete ? "Tap again to remove this card" : "Remove card"}
               </button>
-            ) : (
-              <ol className="install-steps">
-                <li>
-                  <strong>On iPhone or iPad</strong>
-                  <p>Open in Safari, tap Share, then “Add to Home Screen”.</p>
-                </li>
-                <li>
-                  <strong>On Android or desktop</strong>
-                  <p>
-                    Open your browser menu and choose “Install app” or “Add to Home screen”. If already installed, open
-                    Buncard from your apps.
-                  </p>
-                </li>
-              </ol>
-            )}
-            <p className="backup-reminder">
-              Keep a backup handy: cards are stored locally, and some browsers keep installed apps in separate storage.
-            </p>
-          </Sheet>
-        )}
+            </Sheet>
+          )}
+          {panel === "settings" && (
+            <Sheet key="settings" title="Your wallet" onClose={close}>
+              <div className="settings-list">
+                <button
+                  onClick={() => {
+                    file.current?.click()
+                  }}
+                >
+                  <ArrowUpFromLine />
+                  <span>
+                    <strong>Import cards</strong>
+                  </span>
+                  <ChevronRight />
+                </button>
+                <button
+                  onClick={() => {
+                    downloadBackup(cards)
+                    toast.success("Backup exported")
+                  }}
+                  disabled={!cards.length && !storageError}
+                >
+                  <ArrowDownToLine />
+                  <span>
+                    <strong>Export a backup</strong>
+                  </span>
+                  <ChevronRight />
+                </button>
+                <button onClick={() => setPanel("install")}>
+                  <Smartphone />
+                  <span>
+                    <strong>Add to home screen</strong>
+                  </span>
+                  <ChevronRight />
+                </button>
+              </div>
+              <div className="privacy-note">
+                <ShieldCheck />
+                <p>
+                  Cards are saved in this browser. Export a backup before clearing browser data or switching devices.
+                </p>
+              </div>
+              <a className="source-link" href="https://github.com/albertkim/buncard" target="_blank" rel="noreferrer">
+                Source code ↗
+              </a>
+            </Sheet>
+          )}
+          {panel === "install" && (
+            <Sheet key="install" title="Add to home screen" onClose={close}>
+              <div className="install-art">
+                <span className="brand-icon">
+                  <img src="/bun.svg" alt="" />
+                </span>
+                <Sparkles size={25} />
+              </div>
+              {install ? (
+                <button
+                  className="primary"
+                  onClick={async () => {
+                    await install.prompt()
+                    const choice = await install.userChoice
+                    setInstall(null)
+                    if (choice.outcome === "accepted") {
+                      toast.success("Installed")
+                      close()
+                    }
+                  }}
+                >
+                  Add to home screen
+                  <Plus size={18} />
+                </button>
+              ) : (
+                <ol className="install-steps">
+                  <li>
+                    <strong>On iPhone or iPad</strong>
+                    <p>Open in Safari, tap Share, then “Add to Home Screen”.</p>
+                  </li>
+                  <li>
+                    <strong>On Android or desktop</strong>
+                    <p>
+                      Open your browser menu and choose “Install app” or “Add to Home screen”. If already installed,
+                      open Buncard from your apps.
+                    </p>
+                  </li>
+                </ol>
+              )}
+              <p className="backup-reminder">
+                Keep a backup handy: cards are stored locally, and some browsers keep installed apps in separate
+                storage.
+              </p>
+            </Sheet>
+          )}
+        </AnimatePresence>
         <Toaster position="top-center" richColors closeButton />
       </div>
     </MotionConfig>

@@ -2518,3 +2518,173 @@ legend {
     margin-bottom: 22px;
   }
 }
+/* A single spring language for sheets, presses, and cards. */
+.scrim,
+.sheet {
+  animation: none;
+}
+.sheet {
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  transform: none;
+  translate: 0 -50%;
+  will-change: transform, opacity;
+}
+.card-celebration {
+  position: absolute;
+  right: 12px;
+  top: -8px;
+  z-index: 5;
+  color: #ff6738;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 0 #fff9ed);
+}
+.swatch {
+  position: relative;
+}
+.swatch-check {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.camera {
+  position: relative;
+}
+.camera-frame {
+  position: absolute;
+  inset: 15%;
+  z-index: 2;
+  border: 2px solid #fff9edaa;
+  border-radius: 12px;
+  pointer-events: none;
+  overflow: hidden;
+}
+.camera-frame > span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #dfff7f;
+  box-shadow: 0 0 12px #dfff7f;
+  animation: scan-sweep 2.4s ease-in-out infinite;
+}
+.primary svg,
+.scan-actions svg,
+.settings-list button > svg:last-child {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.primary:hover svg {
+  transform: rotate(9deg);
+}
+.scan-actions button:hover svg,
+.settings-list button:hover > svg:last-child {
+  transform: translateX(3px);
+}
+.scan-actions button,
+.scan-button,
+.icon-button,
+.settings-list button,
+.wallet-utilities button {
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
+}
+.scan-actions button:active,
+.scan-button:active,
+.icon-button:active,
+.settings-list button:active {
+  transform: scale(0.97);
+}
+.wallet-card:hover .card-decoration {
+  opacity: 0.23;
+}
+.card-decoration {
+  transition: opacity 0.25s ease;
+}
+.empty-card.front {
+  animation: card-settle 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.empty-card.back {
+  animation: back-settle 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes scan-sweep {
+  0%,
+  100% {
+    top: 10%;
+    opacity: 0.3;
+  }
+  50% {
+    top: 88%;
+    opacity: 1;
+  }
+}
+@keyframes card-settle {
+  from {
+    opacity: 0;
+    transform: rotate(-5deg) translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(10deg) translateY(0);
+  }
+}
+@keyframes back-settle {
+  from {
+    opacity: 0;
+    transform: rotate(5deg) translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-15deg) translateY(0);
+  }
+}
+@media (max-width: 480px) {
+  .sheet {
+    translate: none;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scan-actions button:active,
+  .scan-button:active,
+  .icon-button:active,
+  .settings-list button:active {
+    transform: none;
+  }
+  .primary:hover svg,
+  .scan-actions button:hover svg,
+  .settings-list button:hover > svg:last-child {
+    transform: none;
+  }
+  .sheet {
+    will-change: opacity;
+  }
+}
+.sheet-position {
+  position: fixed;
+  inset: 0;
+  z-index: 21;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.sheet-position .sheet {
+  position: relative;
+  inset: auto;
+  margin: 0;
+  translate: none;
+}
+@media (max-width: 480px) {
+  .sheet-position {
+    align-items: end;
+  }
+  .sheet-position .sheet {
+    width: 100%;
+    inset: auto;
+  }
+}
