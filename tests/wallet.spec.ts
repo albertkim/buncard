@@ -8,7 +8,7 @@ const legacy = {
   createdAt: 1,
   updatedAt: 1,
 }
-test("add, persist, favourite, search, edit, remove, undo", async ({ page }) => {
+test("add, persist, search, edit, remove, undo", async ({ page }) => {
   await page.goto("/")
   await expect(page.getByText("Goodbye, bulky wallet.")).toBeVisible()
   await page.getByRole("button", { name: "Add your first card" }).click()
@@ -17,11 +17,9 @@ test("add, persist, favourite, search, edit, remove, undo", async ({ page }) => 
   await page.getByRole("button", { name: "Add to my wallet" }).click()
   await expect(page.getByRole("button", { name: "Open Coffee club" })).toBeVisible()
   await page.reload()
-  await page.getByRole("button", { name: "Favourite Coffee club", exact: true }).click()
-  await expect(page.getByRole("button", { name: "Unfavourite Coffee club", exact: true })).toHaveAttribute(
-    "aria-pressed",
-    "true"
-  )
+  await expect(page.getByRole("navigation")).toHaveCount(0)
+  await expect(page.getByRole("button", { name: /favourite/i })).toHaveCount(0)
+  await expect(page.getByRole("button", { name: "Add a card", exact: true })).toHaveCount(1)
   await page.getByLabel("Find a card").fill("missing")
   await expect(page.getByText("No cards found")).toBeVisible()
   await page.getByRole("button", { name: "Clear search" }).first().click()
@@ -85,13 +83,11 @@ test("invalid imports are atomic, export includes cards, and Escape closes setti
   await page.evaluate((card) => localStorage.setItem("buncard-cards", JSON.stringify([card])), legacy)
   await page.reload()
   await page.getByRole("button", { name: "Wallet settings" }).click()
-  await page
-    .locator("input[type=file]")
-    .setInputFiles({
-      name: "invalid.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify([legacy, { name: "Invalid" }])),
-    })
+  await page.locator("input[type=file]").setInputFiles({
+    name: "invalid.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify([legacy, { name: "Invalid" }])),
+  })
   await expect(page.getByText("This file does not look like a Buncard backup. No cards were changed.")).toBeVisible()
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("buncard-cards")!).length)).toBe(1)
   const download = page.waitForEvent("download")

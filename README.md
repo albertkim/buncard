@@ -21,9 +21,9 @@ For browser tests, install Chromium once with `npx playwright install chromium`.
 
 ## The wallet experience
 
-- Search by card name, with favourites for your everyday cards.
+- One wallet page with search, a single add action, and a quiet backup/settings utility.
 - Ticket-shaped cards with graphic patterns, a custom rabbit identity, and spring-based press and layout feedback. Reduced-motion preferences are respected.
-- Mobile bottom sheets, thumb-accessible navigation, keyboard focus management, and large touch targets.
+- Mobile bottom sheets, keyboard focus management, and large touch targets.
 - Scan a card with your camera or enter its number. Code 128, EAN-13, and QR display retain their saved format.
 - A clear checkout view requests a screen wake lock when supported. Brightness stays under the device's control.
 - Duplicate-safe imports, export backups, deletion with undo, and protection against overwriting unreadable saved data.

@@ -8,16 +8,13 @@ import {
   Check,
   ChevronRight,
   Copy,
-  Ellipsis,
   Plus,
   ScanLine,
   Search,
   ShieldCheck,
   Smartphone,
   Sparkles,
-  Star,
   Trash2,
-  Wallet,
   X,
 } from "lucide-react"
 import { Toaster, toast } from "sonner"
@@ -219,13 +216,11 @@ function App() {
   const [cards, setCards] = useState(initial.cards)
   const [storageError, setStorageError] = useState(initial.error)
   const [query, setQuery] = useState("")
-  const [tab, setTab] = useState<"all" | "favorites">("all")
   const [panel, setPanel] = useState<"add" | "settings" | "install" | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [editing, setEditing] = useState<Card | undefined>()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [install, setInstall] = useState<InstallEvent | null>(null)
-  const [online, setOnline] = useState(navigator.onLine)
   const file = useRef<HTMLInputElement>(null)
   const selectedCard = cards.find((c) => c.id === selected)
   useEffect(() => {
@@ -233,10 +228,7 @@ function App() {
       e.preventDefault()
       setInstall(e as InstallEvent)
     }
-    const connected = () => setOnline(navigator.onLine)
     window.addEventListener("beforeinstallprompt", handler)
-    window.addEventListener("online", connected)
-    window.addEventListener("offline", connected)
     const sync = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY) {
         const next = loadCards()
@@ -247,8 +239,6 @@ function App() {
     window.addEventListener("storage", sync)
     return () => {
       window.removeEventListener("beforeinstallprompt", handler)
-      window.removeEventListener("online", connected)
-      window.removeEventListener("offline", connected)
       window.removeEventListener("storage", sync)
     }
   }, [])
@@ -322,8 +312,8 @@ function App() {
     input.value = ""
   }
   const visible = cards
-    .filter((c) => (tab === "all" || c.favorite) && c.name.toLowerCase().includes(query.toLowerCase()))
-    .sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite) || b.createdAt - a.createdAt)
+    .filter((c) => c.name.toLowerCase().includes(query.toLowerCase()))
+    .sort((a, b) => b.createdAt - a.createdAt)
   const close = () => {
     setPanel(null)
     setEditing(undefined)
@@ -331,39 +321,36 @@ function App() {
   return (
     <MotionConfig reducedMotion="user">
       <div className="app-shell">
-        <header className="topbar">
-          <a className="brand" href="./" aria-label="Buncard home">
-            <span className="brand-icon">
-              <img src="/bun.svg" alt="" />
-            </span>
-            buncard
-            <span className="brand-dot" aria-hidden="true">
-              ✳
-            </span>
-          </a>
-          <div className="header-actions">
-            <span className="local-badge">
-              <span />
-              {online ? "PRIVATE BY NATURE" : "Offline. Still ready."}
-            </span>
-            <button
-              className="icon-button settings-button"
-              aria-label="Wallet settings"
-              onClick={() => setPanel("settings")}
-            >
-              <Ellipsis />
-            </button>
-          </div>
-        </header>
         <main>
-          <section className={`intro ${cards.length ? "has-cards" : ""}`}>
-            <h1>
-              <span className="heading-lead">Less wallet.</span>
-              <br />
-              <span>More life.</span>
-              <Sparkles className="heading-spark" strokeWidth={1.3} />
-            </h1>
-          </section>
+          <div className="wallet-heading">
+            <div className="brand" aria-label="Buncard">
+              <span className="brand-icon">
+                <img src="/bun.svg" alt="" />
+              </span>
+              buncard
+              <span className="brand-dot" aria-hidden="true">
+                ✳
+              </span>
+            </div>
+            {cards.length > 0 && (
+              <button className="primary" onClick={() => setPanel("add")}>
+                <Plus size={18} />
+                Add a card
+              </button>
+            )}
+          </div>
+          {cards.length === 0 ? (
+            <section className="intro">
+              <h1>
+                <span className="heading-lead">Less wallet.</span>
+                <br />
+                <span>More life.</span>
+                <Sparkles className="heading-spark" strokeWidth={1.3} />
+              </h1>
+            </section>
+          ) : (
+            <h1 className="sr-only">Your wallet</h1>
+          )}
           {storageError && (
             <div className="error storage-error" role="alert">
               {storageError}
@@ -371,28 +358,6 @@ function App() {
             </div>
           )}
           <section className="wallet-section" aria-label="Your wallet">
-            <div className="wallet-toolbar">
-              <div className="segmented" aria-label="Filter cards">
-                <button
-                  aria-pressed={tab === "all"}
-                  className={tab === "all" ? "active" : ""}
-                  onClick={() => setTab("all")}
-                >
-                  My wallet <span>{cards.length}</span>
-                </button>
-                <button
-                  aria-pressed={tab === "favorites"}
-                  className={tab === "favorites" ? "active" : ""}
-                  onClick={() => setTab("favorites")}
-                >
-                  <Star size={15} /> Favourites
-                </button>
-              </div>
-              <button className="primary desktop-add" onClick={() => setPanel("add")}>
-                <Plus size={18} />
-                Add a card
-              </button>
-            </div>
             {cards.length > 0 && (
               <div className="search-box">
                 <Search size={19} />
@@ -445,27 +410,9 @@ function App() {
                       </div>
                       <div className="card-decoration" />
                     </motion.button>
-                    <button
-                      className={`favorite-button ${card.favorite ? "is-favorite" : ""}`}
-                      aria-label={`${card.favorite ? "Unfavourite" : "Favourite"} ${card.name}`}
-                      aria-pressed={!!card.favorite}
-                      onClick={() =>
-                        persist(cards.map((c) => (c.id === card.id ? { ...c, favorite: !c.favorite } : c)))
-                      }
-                    >
-                      <Star size={16} fill={card.favorite ? "currentColor" : "none"} />
-                    </button>
                   </motion.div>
                 ))}
               </AnimatePresence>
-              {cards.length > 0 && !query && tab === "all" && (
-                <button className="add-tile" onClick={() => setPanel("add")}>
-                  <span>
-                    <Plus size={23} />
-                  </span>
-                  <strong>Your next good thing</strong>
-                </button>
-              )}
             </motion.div>
             {visible.length === 0 && (
               <div className="empty-state">
@@ -488,8 +435,8 @@ function App() {
                 ) : (
                   <>
                     <Search size={32} />
-                    <h2>{query ? "No cards found" : "Keep your go-tos close"}</h2>
-                    <p>{query ? "Try another name." : "Tap the star on a card to add it to your favourites."}</p>
+                    <h2>No cards found</h2>
+                    <p>Try another name.</p>
                     {query && (
                       <button className="text-button" onClick={() => setQuery("")}>
                         Clear search
@@ -500,37 +447,12 @@ function App() {
               </div>
             )}
           </section>
-          <section className="install-banner">
-            <span className="install-icon">
-              <Smartphone size={25} strokeWidth={1.5} />
-            </span>
-            <div>
-              <h2>Pocket-sized. Home-screen ready.</h2>
-            </div>
-            <button onClick={() => setPanel("install")} aria-label="Install Buncard">
-              Make it an app <ChevronRight size={17} />
+          <div className="wallet-utilities">
+            <button aria-label="Wallet settings" onClick={() => setPanel("settings")}>
+              Backup & settings
             </button>
-          </section>
+          </div>
         </main>
-        <nav className="mobile-nav" aria-label="Wallet navigation">
-          <button
-            className={tab === "all" ? "current" : ""}
-            onClick={() => {
-              setTab("all")
-              setQuery("")
-            }}
-          >
-            <Wallet size={21} />
-            Wallet
-          </button>
-          <button className="mobile-add" onClick={() => setPanel("add")} aria-label="Add a card">
-            <Plus size={25} />
-          </button>
-          <button className={tab === "favorites" ? "current" : ""} onClick={() => setTab("favorites")}>
-            <Star size={21} />
-            Favourites
-          </button>
-        </nav>
         <input
           ref={file}
           type="file"
